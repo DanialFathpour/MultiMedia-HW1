@@ -104,7 +104,50 @@ class MainWindow(QMainWindow):
         QTimer.singleShot(150, self.enable_capture_button)
 
         if ret:
-            cv2.imwrite('captured_frame.jpg', frame)
+            
+            #create trackbars for enabling and changing light intensity using "gamma correction method" --- 
+            cv2.namedWindow('Preview (Press q to select and exit)')
+            cv2.createTrackbar('Level ', 'Preview (Press q to select and exit)', 10, 50, self.adjust_gamma)
+            cv2.createTrackbar('Enable ', 'Preview (Press q to select and exit)', 0, 1, self.enable_gamma_correction)
+
+            #preview loop press "q" to select and exit
+            while True:
+
+                #set the gamma value between 0 and 5
+                gamma_value = cv2.getTrackbarPos('Level ', 'Preview (Press q to select and exit)')/10
+
+                #enabling the gamma correction
+                enable_gamma = cv2.getTrackbarPos('Enable ', 'Preview (Press q to select and exit)')
+                if enable_gamma:
+                    adjusted_frame = self.apply_gamma_correction(frame, gamma_value)
+                else:
+                    adjusted_frame = frame
+
+                #showing the adjusted frame
+                cv2.imshow('Preview (Press q to select and exit)', adjusted_frame)
+
+                #Press "q" key to exit
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+            #save and write the captured image
+            cv2.imwrite('captured_frame.jpg', adjusted_frame)
+            cv2.destroyAllWindows()
+
+    # Apply gamma correction
+    def apply_gamma_correction(self, frame, gamma=1.0):
+        gamma_corrected = np.power(frame / 255.0, gamma)
+        gamma_corrected = (gamma_corrected * 255).astype(np.uint8)
+        return gamma_corrected
+
+    # Callback function for adjusting gamma correction
+    def adjust_gamma(self, gamma_value):
+        pass
+
+    # Callback function for enabling/disabling gamma correction
+    def enable_gamma_correction(self, enable_gamma):
+        pass
+
 
     #helper function for enabling capture button after a delay
     def enable_capture_button(self):
