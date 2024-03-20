@@ -12,6 +12,8 @@ import threading
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        #Set window parameters
         self.HEIGHT = 600 
         self.WIDTH = 800
         self.setWindowTitle("Webcam and Voice Recorder")
@@ -41,7 +43,7 @@ class MainWindow(QMainWindow):
         self.record_button.clicked.connect(self.start_audio_recording)
 
 
-        # Show buttons
+        # Show and play buttons
         self.show_frame_button = QPushButton("Show Frame", self)
         self.show_frame_button.setGeometry(self.WIDTH*3//4, self.HEIGHT*1//6 + 200, 230, 150)
         self.show_frame_button.setIcon(QIcon('show.png')) 
@@ -57,7 +59,7 @@ class MainWindow(QMainWindow):
         self.play_audio_button.clicked.connect(self.play_recorded_audio)
 
 
-        # Timer label
+        # Timer label for recording
         self.timer_label = QLabel("00:00:00",self)
         self.timer_label.setGeometry(200,500, 150, 50)
         self.timer_label.setStyleSheet("font-size: 30px; color: black;")
@@ -68,7 +70,7 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.update_frame)
         self.timer.start(10)
 
-        # Audio recording parameters
+        # Audio parameters
         self.audio_format = pyaudio.paInt16
         self.audio_channels = 1
         self.audio_sample_rate = 44100
@@ -82,29 +84,35 @@ class MainWindow(QMainWindow):
 
         self.start_time = None
 
+    #updating frames and displaying them
     def update_frame(self):
         ret, frame = self.capture.read()
         if ret:
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             h, w, ch = frame.shape
-            frame = cv2.flip(frame, 1)
             bytes_per_line = ch * w
             convert_to_qt_format = QImage(frame.data, w, h, bytes_per_line, QImage.Format_RGB888)
             p = convert_to_qt_format.scaled(self.WIDTH*2//3, self.HEIGHT*2//3, Qt.KeepAspectRatio)
             self.video_label.setPixmap(QPixmap.fromImage(p))
 
+    #function for capture a snapshot
     def capture_frame(self):
         ret, frame = self.capture.read()
-        frame = cv2.flip(frame, 1)
+
+        #disabling the button for 150 miliseconds making capture animation
         self.capture_button.setEnabled(False)
         QTimer.singleShot(150, self.enable_capture_button)
+
         if ret:
             cv2.imwrite('captured_frame.jpg', frame)
 
+    #helper function for enabling capture button after a delay
     def enable_capture_button(self):
         self.capture_button.setEnabled(True)
     
+
     def start_audio_recording(self):
+        #use multithreading for audio recording
         self.audio_thread = threading.Thread(target=self.record_voice)
         self.audio_thread.start()
         self.recording_timer.start(10)
@@ -146,13 +154,14 @@ class MainWindow(QMainWindow):
 
         frames = []
 
-        print("recording...")
+        #disabling record button during the recording
         self.record_button.setEnabled(False)
+
+        #recording ...
         for i in range(0, int(self.audio_sample_rate / self.audio_chunk_size * self.audio_duration)):
             data = stream.read(self.audio_chunk_size)
             frames.append(data)
 
-        print("end recording")
         stream.stop_stream()
         stream.close()
         audio.terminate()
@@ -163,15 +172,26 @@ class MainWindow(QMainWindow):
         wave_file.setframerate(self.audio_sample_rate)
         wave_file.writeframes(b''.join(frames))
         wave_file.close()
+
+        #enabling record button after recording
         self.record_button.setEnabled(True)
 
+    #update record timer
     def update_timer(self):
         if self.start_time:
+            #calculating elapsed time as seconds
             elapsed_time = time.time() - self.start_time
+
+            #calculating seconds/100
             m_seconds = int(elapsed_time*100) % 100
+
+            #update the timer
             self.timer_label.setText("00:{:02d}:{:02d}".format(int(elapsed_time) , m_seconds))
+
         else :
             elapsed_time = 0
+
+        #restart the timer
         if elapsed_time > 30:
             self.start_time = None
             self.timer_label.setText("00:00:00")
