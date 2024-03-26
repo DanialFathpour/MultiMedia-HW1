@@ -84,6 +84,12 @@ class MainWindow(QMainWindow):
 
         self.start_time = None
 
+        #send button
+        self.send_button = QPushButton("Send", self)
+        self.send_button.setGeometry(600, 485, 150, 70)
+        self.send_button.setStyleSheet("background-color: #3a8721; color: white; border: none; padding: 0px;border-radius: 25px;font-size: 20px")
+        self.send_button.clicked.connect(self.send_data)  # Connect the button click to the send_data function
+
     #updating frames and displaying them
     def update_frame(self):
         ret, frame = self.capture.read()
@@ -239,6 +245,8 @@ class MainWindow(QMainWindow):
             self.start_time = None
             self.timer_label.setText("00:00:00")
 
+    def send_data(self):
+        pass
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
