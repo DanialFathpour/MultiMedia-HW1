@@ -5,7 +5,7 @@ import pyaudio
 import wave
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel
 from PyQt5.QtGui import QImage, QPixmap, QIcon
-from PyQt5.QtCore import QTimer, Qt, QTime , QSize
+from PyQt5.QtCore import QTimer, Qt, QSize
 import time
 import threading
 
@@ -13,21 +13,21 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        #Set window parameters
+        #Set window parameters----------
         self.HEIGHT = 600 
         self.WIDTH = 800
         self.setWindowTitle("Webcam and Voice Recorder")
         self.setGeometry(100, 100, self.WIDTH, self.HEIGHT)
 
-        # Main window background color and font
+        # Main window background color and font---------
         self.setStyleSheet("background-color: #f0f0f0; font-family: Arial;")
 
-        # Video label
+        # Video label-----------
         self.video_label = QLabel(self)
         self.video_label.setGeometry(20, 20, self.WIDTH*2//3, self.HEIGHT*2//3)
         self.video_label.setStyleSheet("border: 2px solid black; background-color: white;")
 
-        # Buttons
+        # Buttons--------------
         self.capture_button = QPushButton(self)
         self.capture_button.setGeometry(self.WIDTH*3//4, self.HEIGHT*1//6, 150, 150)
         self.capture_button.setIcon(QIcon('Image-Capture-icon.png')) 
@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         self.record_button.clicked.connect(self.start_audio_recording)
 
 
-        # Show and play buttons
+        # Show and play buttons---------------
         self.show_frame_button = QPushButton("Show Frame", self)
         self.show_frame_button.setGeometry(self.WIDTH*3//4, self.HEIGHT*1//6 + 200, 230, 150)
         self.show_frame_button.setIcon(QIcon('show.png')) 
@@ -59,18 +59,18 @@ class MainWindow(QMainWindow):
         self.play_audio_button.clicked.connect(self.play_recorded_audio)
 
 
-        # Timer label for recording
+        # Timer label for recording---------------------------
         self.timer_label = QLabel("00:00:00",self)
         self.timer_label.setGeometry(200,500, 150, 50)
         self.timer_label.setStyleSheet("font-size: 30px; color: black;")
 
-        # Webcam capture and timer
+        # Webcam capture and timer-------------------------
         self.capture = cv2.VideoCapture(0)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_frame)
         self.timer.start(10)
 
-        # Audio parameters
+        # Audio parameters------------------------------
         self.audio_format = pyaudio.paInt16
         self.audio_channels = 1
         self.audio_sample_rate = 44100
@@ -84,13 +84,13 @@ class MainWindow(QMainWindow):
 
         self.start_time = None
 
-        #send button
+        #send button--------------------------
         self.send_button = QPushButton("Send", self)
         self.send_button.setGeometry(600, 485, 150, 70)
         self.send_button.setStyleSheet("background-color: #3a8721; color: white; border: none; padding: 0px;border-radius: 25px;font-size: 20px")
         self.send_button.clicked.connect(self.send_data)  # Connect the button click to the send_data function
 
-    #updating frames and displaying them
+    #updating frames and displaying them-----------------------
     def update_frame(self):
         ret, frame = self.capture.read()
         if ret:
@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
             p = convert_to_qt_format.scaled(self.WIDTH*2//3, self.HEIGHT*2//3, Qt.KeepAspectRatio)
             self.video_label.setPixmap(QPixmap.fromImage(p))
 
-    #function for capture a snapshot
+    #function for capture a snapshot---------------------------
     def capture_frame(self):
         ret, frame = self.capture.read()
 
@@ -140,26 +140,26 @@ class MainWindow(QMainWindow):
             cv2.imwrite('captured_frame.jpg', adjusted_frame)
             cv2.destroyAllWindows()
 
-    # Apply gamma correction
+    # Apply gamma correction-----------------------
     def apply_gamma_correction(self, frame, gamma=1.0):
         gamma_corrected = np.power(frame / 255.0, gamma)
         gamma_corrected = (gamma_corrected * 255).astype(np.uint8)
         return gamma_corrected
 
-    # Callback function for adjusting gamma correction
+    # Callback function for adjusting gamma correction-------------
     def adjust_gamma(self, gamma_value):
         pass
 
-    # Callback function for enabling/disabling gamma correction
+    # Callback function for enabling/disabling gamma correction--------------
     def enable_gamma_correction(self, enable_gamma):
         pass
 
 
-    #helper function for enabling capture button after a delay
+    #helper function for enabling capture button after a delay---------------
     def enable_capture_button(self):
         self.capture_button.setEnabled(True)
     
-
+    #start recording audio--------------------
     def start_audio_recording(self):
         #use multithreading for audio recording
         self.audio_thread = threading.Thread(target=self.record_voice)
@@ -167,17 +167,20 @@ class MainWindow(QMainWindow):
         self.recording_timer.start(10)
         self.start_time = time.time()
 
+    #show the captured frame in a seprate window-----------------
     def show_captured_frame(self):
         captured_frame = cv2.imread('captured_frame.jpg')
         cv2.imshow('Captured Frame', captured_frame)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
     
+    #start playing the recorded audio in a seprate thread----------------
     def play_recorded_audio(self):
         if self.play_audio_thread is None or not self.play_audio_thread.is_alive():
             self.play_audio_thread = threading.Thread(target=self.play_audio)
             self.play_audio_thread.start()
 
+    #play the recorded audio-----------
     def play_audio(self):
         wave_file = wave.open(self.audio_file, 'rb')
         audio_data = wave_file.readframes(-1)
@@ -193,6 +196,7 @@ class MainWindow(QMainWindow):
         stream.close()
         audio.terminate()
     
+    #record audio-----------
     def record_voice(self):
         audio = pyaudio.PyAudio()
         stream = audio.open(format=self.audio_format,
@@ -225,7 +229,7 @@ class MainWindow(QMainWindow):
         #enabling record button after recording
         self.record_button.setEnabled(True)
 
-    #update record timer
+    #update record timer--------------------
     def update_timer(self):
         if self.start_time:
             #calculating elapsed time as seconds
@@ -245,6 +249,7 @@ class MainWindow(QMainWindow):
             self.start_time = None
             self.timer_label.setText("00:00:00")
 
+    #Send the data ----------
     def send_data(self):
         pass
 
