@@ -11,6 +11,7 @@ import threading
 from Server import server  #import server from server code for recieve
 from Client import client  #import client from client code for sending 
 
+#warning
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
