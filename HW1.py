@@ -8,6 +8,8 @@ from PyQt5.QtGui import QImage, QPixmap, QIcon
 from PyQt5.QtCore import QTimer, Qt, QSize
 import time
 import threading
+from Server import server  #import server from server code for recieve
+from Client import client  #import client from client code for sending 
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -86,9 +88,15 @@ class MainWindow(QMainWindow):
 
         #send button--------------------------
         self.send_button = QPushButton("Send", self)
-        self.send_button.setGeometry(600, 485, 150, 70)
-        self.send_button.setStyleSheet("background-color: #3a8721; color: white; border: none; padding: 0px;border-radius: 25px;font-size: 20px")
+        self.send_button.setGeometry(600, 485, 150, 35)
+        self.send_button.setStyleSheet("background-color: #3a8721; color: white; border: none; padding: 0px;border-radius:10px;font-size: 20px")
         self.send_button.clicked.connect(self.send_data)  # Connect the button click to the send_data function
+
+        #recieve button--------------------------
+        self.recieve_button = QPushButton("Recieve", self)
+        self.recieve_button.setGeometry(600, 485 + 50, 150, 35)
+        self.recieve_button.setStyleSheet("background-color: #cc4221; color: white; border: none; padding: 0px;border-radius:10px;font-size: 20px")
+        self.recieve_button.clicked.connect(self.recieve_data)  # Connect the button click to the send_data function
 
     #updating frames and displaying them-----------------------
     def update_frame(self):
@@ -251,7 +259,11 @@ class MainWindow(QMainWindow):
 
     #Send the data ----------
     def send_data(self):
-        pass
+        client()
+
+    #Recieve the data ---------
+    def recieve_data(self):
+        server()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
