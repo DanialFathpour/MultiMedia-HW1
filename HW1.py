@@ -11,7 +11,6 @@ import threading
 from Server import server  #import server from server code for recieve
 from Client import client  #import client from client code for sending 
 
-#warning
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -260,11 +259,11 @@ class MainWindow(QMainWindow):
 
     #Send the data ----------
     def send_data(self):
-        client()
+        pass
 
     #Recieve the data ---------
     def recieve_data(self):
-        server()
+        pass
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
