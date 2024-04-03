@@ -1,7 +1,8 @@
 # importing libraries
 import socket
+
 def client():
-    HOST = '192.168.1.37' # my own local IP address
+    HOST = '192.168.1.35' # my own local IP address
     #Image
     PORT_image = 21200 # random! (Must be the same with the server)
     #Audio
@@ -16,7 +17,7 @@ def client():
 
     # Opening files
     file_image = open("captured_frame.jpg", "rb")
-    file_audio = open("output.wav", "rb")
+    file_audio = open("recorded_audio.wav", "rb")
 
     # Sending file names
     client_image.send("received_image.jpg".encode())

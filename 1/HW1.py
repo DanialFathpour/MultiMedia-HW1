@@ -8,9 +8,10 @@ from PyQt5.QtGui import QImage, QPixmap, QIcon
 from PyQt5.QtCore import QTimer, Qt, QSize
 import time
 import threading
-from Server import server  #import server from server code for recieve
+from Server import server  #import server from server code for recieving
 from Client import client  #import client from client code for sending 
 
+#warning
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -90,13 +91,15 @@ class MainWindow(QMainWindow):
         self.send_button = QPushButton("Send", self)
         self.send_button.setGeometry(600, 485, 150, 35)
         self.send_button.setStyleSheet("background-color: #3a8721; color: white; border: none; padding: 0px;border-radius:10px;font-size: 20px")
-        self.send_button.clicked.connect(self.send_data)  # Connect the button click to the send_data function
+        self.send_button.clicked.connect(self.send_data_helper)  # Connect the button click to the send_data function
+        self.send_thread = None
 
         #recieve button--------------------------
         self.recieve_button = QPushButton("Recieve", self)
         self.recieve_button.setGeometry(600, 485 + 50, 150, 35)
         self.recieve_button.setStyleSheet("background-color: #cc4221; color: white; border: none; padding: 0px;border-radius:10px;font-size: 20px")
-        self.recieve_button.clicked.connect(self.recieve_data)  # Connect the button click to the send_data function
+        self.recieve_button.clicked.connect(self.recieve_data_helper)  # Connect the button click to the send_data function
+        self.recieve_thread = None
 
     #updating frames and displaying them-----------------------
     def update_frame(self):
@@ -258,12 +261,22 @@ class MainWindow(QMainWindow):
             self.timer_label.setText("00:00:00")
 
     #Send the data ----------
+    def send_data_helper(self):
+        print("sendh")
+        self.send_thread = threading.Thread(target=self.send_data)
+        self.send_thread.start()
+
     def send_data(self):
-        pass
+        print("send")
+        client()
 
     #Recieve the data ---------
+    def recieve_data_helper(self):
+        self.recieve_thread = threading.Thread(target=self.recieve_data)
+        self.recieve_thread.start()
+
     def recieve_data(self):
-        pass
+        server()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

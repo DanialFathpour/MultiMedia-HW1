@@ -6,8 +6,7 @@
 import socket
 
 def server():
-    HOST = '192.168.1.37' # my own local IP address
-
+    HOST = '192.168.1.34' # my own local IP address
     # Image
     PORT_image = 21200 # random! (Must be the same with the client)
     # Audio
