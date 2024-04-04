@@ -28,6 +28,6 @@ we used multithreading because VScode froze. (probably because this code uses mu
 
 the UI is done with pyQT.
 
-==Caution:== First you should click `receive` then `send` for it to work properly. (First it should create the server)
+**Caution:** First you should click `receive` then `send` for it to work properly. (First it should create the server)
 
 ## Wireless Communication & Command**
