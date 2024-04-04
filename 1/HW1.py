@@ -112,7 +112,7 @@ class MainWindow(QMainWindow):
             p = convert_to_qt_format.scaled(self.WIDTH*2//3, self.HEIGHT*2//3, Qt.KeepAspectRatio)
             self.video_label.setPixmap(QPixmap.fromImage(p))
 
-    #function for capture a snapshot---------------------------
+    #function for capturing an snapshot---------------------------
     def capture_frame(self):
         ret, frame = self.capture.read()
 
@@ -262,12 +262,10 @@ class MainWindow(QMainWindow):
 
     #Send the data ----------
     def send_data_helper(self):
-        print("sendh")
         self.send_thread = threading.Thread(target=self.send_data)
         self.send_thread.start()
 
     def send_data(self):
-        print("send")
         client()
 
     #Recieve the data ---------
