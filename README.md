@@ -21,13 +21,13 @@ for installing any of the libraries above, you should open your termnial (for in
 
 ### How it works
 
-1. Webcam Capture and Image Editing: The application displays the webcam feed using `OpenCV`. Users can capture an image from the webcam, which is then displayed in a separate window. Additionally, there's an option to edit the captured image using the `Gamma Correction method`, which adjusts the brightness of the image. `Gamma correction` is implemented using `NumPy`.
+1. **Webcam Capture and Image Editing**: The application displays the webcam feed using `OpenCV`. Users can capture an image from the webcam, which is then displayed in a separate window. Additionally, there's an option to edit the captured image using the `Gamma Correction method`, which adjusts the brightness of the image. `Gamma correction` is implemented using `NumPy`.
 
-2. Audio Recording: The application can record audio for 30 seconds using the `PyAudio` library. The recorded audio is saved as a WAV file.
+2. **Audio Recording**: The application can record audio for 30 seconds using the `PyAudio` library. The recorded audio is saved as a WAV file.
 
-3. Sending and Receiving Data: Data transmission is handled through separate `server.py` and `client.py` scripts using the `socket` library for `TCP/IP` communication. The server script creates a TCP/IP server, and the client script exchanges data packets with the server on specified ports (21200 for images and 21300 for audio). Multithreading is utilized to prevent freezing of the application, especially during data transmission.
+3. **Sending and Receiving Data**: Data transmission is handled through separate `server.py` and `client.py` scripts using the `socket` library for `TCP/IP` communication. The server script creates a TCP/IP server, and the client script exchanges data packets with the server on specified ports (21200 for images and 21300 for audio). Multithreading is utilized to prevent freezing of the application, especially during data transmission.
 
-4. User Interface: The UI is designed using `PyQt5`, featuring buttons for capturing images, recording audio, playing recorded audio, and sending/receiving data. Additionally, there's a timer display for tracking the recording duration.
+4. **User Interface**: The UI is designed using `PyQt5`, featuring buttons for capturing images, recording audio, playing recorded audio, and sending/receiving data. Additionally, there's a timer display for tracking the recording duration.
    
 ### How to use
 
