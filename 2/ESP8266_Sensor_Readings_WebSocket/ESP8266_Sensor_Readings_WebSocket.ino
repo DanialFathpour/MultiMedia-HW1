@@ -25,7 +25,7 @@ unsigned long timerDelay = 2000; // Means it reads ans sends values every 2s
 
 // Get Sensor Readings and return JSON object
 String getSensorReadings(){
-  readings["temperature"] = String(analogRead(A0));
+  readings["light"] = String(analogRead(A0));
   String jsonString = JSON.stringify(readings);
   return jsonString;
 }
