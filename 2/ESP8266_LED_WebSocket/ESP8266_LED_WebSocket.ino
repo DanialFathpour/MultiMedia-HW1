@@ -14,8 +14,23 @@ const int ledPin = 2;
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
+
+// Create a WebSocket object
 AsyncWebSocket ws("/ws");
 
+// Json Variable to Hold Sensor Readings
+JSONVar readings;
+
+// Timer variables
+unsigned long lastTime = 0;  
+unsigned long timerDelay = 2000; // Means it reads ans sends values every 2s
+
+// Get Sensor Readings and return JSON object
+String getSensorReadings(){
+  readings["light"] = String(analogRead(A0));
+  String jsonString = JSON.stringify(readings);
+  return jsonString;
+}
 
 void initFS() {
   if (!LittleFS.begin()) {
@@ -38,17 +53,21 @@ void initWiFi() {
   Serial.println(WiFi.localIP());
 }
 
-void notifyClients() {
+void notifyClients(String sensorReadings) {
   ws.textAll(String(ledState));
+  ws.textAll(sensorReadings);
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    String sensorReadings = getSensorReadings();
+    Serial.print(sensorReadings);
+    notifyClients(sensorReadings);
     data[len] = 0;
     if (strcmp((char*)data, "toggle") == 0) {
       ledState = !ledState;
-      notifyClients();
+      notifyClients(sensorReadings);
     }
   }
 }
@@ -73,19 +92,6 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 void initWebSocket() {
   ws.onEvent(onEvent);
   server.addHandler(&ws);
-}
-
-String processor(const String& var){
-  Serial.println(var);
-  if(var == "STATE"){
-    if (ledState){
-      return "ON";
-    }
-    else{
-      return "OFF";
-    }
-  }
-  return String();
 }
 
 void setup(){
@@ -116,6 +122,17 @@ void setup(){
 }
 
 void loop() {
-  ws.cleanupClients();
+
+  if ((millis() - lastTime) > timerDelay) {
+    String sensorReadings = getSensorReadings();
+    Serial.print(sensorReadings);
+    notifyClients(sensorReadings);
+
+  lastTime = millis();
+  
+  }
+
   digitalWrite(ledPin, ledState);
+
+  ws.cleanupClients();
 }

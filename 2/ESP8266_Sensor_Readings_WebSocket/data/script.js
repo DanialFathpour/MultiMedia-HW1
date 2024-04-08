@@ -6,6 +6,7 @@ window.addEventListener('load', onload);
 
 function onload(event) {
     initWebSocket();
+	initButton();
 }
 
 function getReadings(){
@@ -41,4 +42,21 @@ function onMessage(event) {
         var key = keys[i];
         document.getElementById(key).innerHTML = myObj[key];
     }
+	
+	var state;
+    if (event.data == "1"){
+      state = "ON";
+    }
+    else{
+      state = "OFF";
+    }
+    document.getElementById('state').innerHTML = state;
 }
+
+  function initButton() {
+    document.getElementById('button').addEventListener('click', toggle);
+  }
+
+  function toggle(){
+    websocket.send('toggle');
+  }
