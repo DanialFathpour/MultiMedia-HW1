@@ -22,7 +22,6 @@ JSONVar readings;
 unsigned long lastTime = 0;  
 unsigned long timerDelay = 2000; // Means it reads ans sends values every 2s
 
-
 // Get Sensor Readings and return JSON object
 String getSensorReadings(){
   readings["light"] = String(analogRead(A0));
@@ -95,7 +94,9 @@ void initWebSocket() {
 
 //--------------------------------------------------------------------------------------------------
 void setup() {
+  
   Serial.begin(115200);
+
   initWiFi();
   initFS();
   initWebSocket();
