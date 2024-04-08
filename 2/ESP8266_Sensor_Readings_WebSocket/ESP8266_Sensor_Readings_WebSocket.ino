@@ -5,7 +5,7 @@
 #include "LittleFS.h"
 #include <Arduino_JSON.h>
 
-// Replace with your network credentials
+// Network router credentials
 const char* ssid = "Daniel_modem";
 const char* password = "MAUXX93633";
 
@@ -20,7 +20,7 @@ JSONVar readings;
 
 // Timer variables
 unsigned long lastTime = 0;  
-unsigned long timerDelay = 2000;
+unsigned long timerDelay = 2000; // Means it reads ans sends values every 2s
 
 
 // Get Sensor Readings and return JSON object
@@ -88,6 +88,12 @@ void initWebSocket() {
   server.addHandler(&ws);
 }
 
+
+
+
+
+
+//--------------------------------------------------------------------------------------------------
 void setup() {
   Serial.begin(115200);
   initWiFi();
@@ -105,6 +111,9 @@ void setup() {
   server.begin();
 }
 
+
+
+//---------------------------------------------------------------------------------------------------
 void loop() {
   if ((millis() - lastTime) > timerDelay) {
     String sensorReadings = getSensorReadings();
