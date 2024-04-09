@@ -104,11 +104,6 @@ void setup(){
   initWiFi();
   initWebSocket();
 
-  // Route for root / web page
- /* server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", index_html, processor);
-  });*/
-
   // Web Server Root URL
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(LittleFS, "/index.html", "text/html");
