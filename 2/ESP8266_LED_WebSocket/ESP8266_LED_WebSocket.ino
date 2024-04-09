@@ -4,6 +4,7 @@
 #include <ESPAsyncWebServer.h>
 #include "LittleFS.h"
 #include <Arduino_JSON.h>
+#include <Hash.h>
 
 // Replace with your network credentials
 const char* ssid = "Daniel_modem";
@@ -30,6 +31,19 @@ String getSensorReadings(){
   readings["light"] = String(analogRead(A0));
   String jsonString = JSON.stringify(readings);
   return jsonString;
+}
+
+String readsensor() {
+  // Read temperature as Celsius (the default)
+  float t = analogRead(A0);
+  if (isnan(t)) {    
+    Serial.println("Failed to read sensor!");
+    return "";
+  }
+  else {
+    Serial.println(t);
+    return String(t);
+  }
 }
 
 void initFS() {
@@ -107,6 +121,10 @@ void setup(){
   // Web Server Root URL
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(LittleFS, "/index.html", "text/html");
+  });
+
+  server.on("/light", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send_P(200, "text/plain", readsensor().c_str());
   });
 
   server.serveStatic("/", LittleFS, "/");
