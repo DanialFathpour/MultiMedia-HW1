@@ -6,17 +6,19 @@
 #include <Arduino_JSON.h>
 #include <Hash.h>
 
-// Replace with your network credentials
+
+// Should be replaced with your network credentials
 const char* ssid = "Daniel_modem";
 const char* password = "MAUXX93633";
 
+// Defines LED pin and state
 bool ledState = 0;
 const int ledPin = 2;
 
-// Create AsyncWebServer object on port 80
+// Creates AsyncWebServer object on port 80 mmeans HTTP
 AsyncWebServer server(80);
 
-// Create a WebSocket object
+// Creates a WebSocket object
 AsyncWebSocket ws("/ws");
 
 // Json Variable to Hold Sensor Readings
@@ -26,7 +28,7 @@ JSONVar readings;
 unsigned long lastTime = 0;  
 unsigned long timerDelay = 2000; // Means it reads ans sends values every 2s
 
-// Get Sensor Readings and return JSON object
+// Gets Sensor Readings and return JSON object
 String getSensorReadings(){
   readings["light"] = String(analogRead(A0));
   String jsonString = JSON.stringify(readings);
@@ -34,18 +36,11 @@ String getSensorReadings(){
 }
 
 String readsensor() {
-  // Read temperature as Celsius (the default)
   float t = analogRead(A0);
-  if (isnan(t)) {    
-    Serial.println("Failed to read sensor!");
-    return "";
-  }
-  else {
-    Serial.println(t);
-    return String(t);
-  }
+  return String(t);
 }
 
+// Initializes FileSystem uploader
 void initFS() {
   if (!LittleFS.begin()) {
     Serial.println("An error has occurred while mounting LittleFS");
@@ -55,7 +50,7 @@ void initFS() {
   }
 }
 
-// Initialize WiFi
+// Initializes WiFi
 void initWiFi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -67,11 +62,13 @@ void initWiFi() {
   Serial.println(WiFi.localIP());
 }
 
+// Texts sensor readings and LED state using the Websocket object 
 void notifyClients(String sensorReadings) {
   ws.textAll(String(ledState));
   ws.textAll(sensorReadings);
 }
 
+// Handles the incoming websocket message from the client
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
@@ -85,6 +82,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   }
 }
 
+// Checks wether any client is connected/disconnected
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type, void *arg, uint8_t *data, size_t len) {
   switch (type) {
     case WS_EVT_CONNECT:
@@ -102,13 +100,15 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
   }
 }
 
+// Initializes Websocket
 void initWebSocket() {
   ws.onEvent(onEvent);
   server.addHandler(&ws);
 }
 
+
+//--------------------------------------------------------------------------------------------------------------------------------------
 void setup(){
-  // Serial port for debugging purposes
   Serial.begin(115200);
 
   pinMode(ledPin, OUTPUT);
@@ -123,28 +123,31 @@ void setup(){
     request->send(LittleFS, "/index.html", "text/html");
   });
 
+  // Web Server request for the plot
   server.on("/light", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", readsensor().c_str());
   });
 
+//
   server.serveStatic("/", LittleFS, "/");
 
-  // Start server
+  // Starts server
   server.begin();
 }
 
+//-----------------------------------------------------------------------------------------------------------------------------------------
 void loop() {
 
+// Sends the data every 2s
   if ((millis() - lastTime) > timerDelay) {
     String sensorReadings = getSensorReadings();
     Serial.print(sensorReadings);
     notifyClients(sensorReadings);
-
-  lastTime = millis();
-  
+    lastTime = millis();
   }
 
   digitalWrite(ledPin, ledState);
 
+// 
   ws.cleanupClients();
 }

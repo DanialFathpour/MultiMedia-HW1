@@ -1,18 +1,8 @@
-
+// Defines the websocket and the gateway for it
 var gateway = `ws://${window.location.hostname}/ws`;
 var websocket;
-// Init web socket when the page loads
+// Inits web socket when the page loads
 window.addEventListener('load', onload);
-
-function onload(event) {
-    initWebSocket();
-	initButton();
-}
-
-function getReadings(){
-    websocket.send("getReadings");
-}
-
 function initWebSocket() {
     console.log('Trying to open a WebSocket connection…');
     websocket = new WebSocket(gateway);
@@ -21,12 +11,24 @@ function initWebSocket() {
     websocket.onmessage = onMessage;
 }
 
+//Inits stuff
+function onload(event) {
+    initWebSocket();
+	initButton();
+}
+
+//Gets sensor readings
+function getReadings(){
+    websocket.send("getReadings");
+}
+
 // When websocket is established, call the getReadings() function
 function onOpen(event) {
     console.log('Connection opened');
     getReadings();
 }
 
+//Closes the sebsocket connection
 function onClose(event) {
     console.log('Connection closed');
     setTimeout(initWebSocket, 2000);
@@ -53,14 +55,17 @@ function onMessage(event) {
     document.getElementById('state').innerHTML = state;
 }
 
+// Inits the button
   function initButton() {
     document.getElementById('button').addEventListener('click', toggle);
   }
 
+// Sends the 'toggle' request to change the LED state
   function toggle(){
     websocket.send('toggle');
   }
-  
+ 
+// Defines the chart  
   var chartT = new Highcharts.Chart({
   chart:{ renderTo : 'chart-light' },
   title: { text: 'Light' },
@@ -82,6 +87,8 @@ function onMessage(event) {
   },
   credits: { enabled: false }
 });
+
+// Sets a time interval (here is 2s) between 2 request for updating the chart
 setInterval(function ( ) {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
