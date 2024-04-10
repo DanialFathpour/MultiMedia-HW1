@@ -5,13 +5,12 @@ import pyaudio
 import wave
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel
 from PyQt5.QtGui import QImage, QPixmap, QIcon
-from PyQt5.QtCore import QTimer, Qt, QSize
+from PyQt5.QtCore import QTimer, Qt, QSize 
 import time
 import threading
-from Server import server  #import server from server code for recieving
+from Server import server  #import server from server code for receiving
 from Client import client  #import client from client code for sending 
 
-#warning
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -51,14 +50,14 @@ class MainWindow(QMainWindow):
         self.show_frame_button.setGeometry(self.WIDTH*3//4, self.HEIGHT*1//6 + 200, 230, 150)
         self.show_frame_button.setIcon(QIcon('show.png')) 
         self.show_frame_button.setIconSize(QSize(150, 150))
-        self.show_frame_button.setStyleSheet("background-color: #f0f0f0; color: white; border: none; padding: 0px;border-radius: 25px;")
+        self.show_frame_button.setStyleSheet("background-color: #f0f0f0; color: #f0f0f0; border: none; padding: 0px;border-radius: 25px;")
         self.show_frame_button.clicked.connect(self.show_captured_frame)
 
         self.play_audio_button = QPushButton("Play Audio", self)
         self.play_audio_button.setGeometry(400, 485, 150, 70)
         self.play_audio_button.setIcon(QIcon('play.png')) 
         self.play_audio_button.setIconSize(self.play_audio_button.size())
-        self.play_audio_button.setStyleSheet("background-color: #f0f0f0; color: white; border: none; padding: 0px;border-radius: 75px;")
+        self.play_audio_button.setStyleSheet("background-color: #f0f0f0; color: #f0f0f0; border: none; padding: 0px;border-radius: 75px;")
         self.play_audio_button.clicked.connect(self.play_recorded_audio)
 
 
@@ -94,12 +93,12 @@ class MainWindow(QMainWindow):
         self.send_button.clicked.connect(self.send_data_helper)  # Connect the button click to the send_data function
         self.send_thread = None
 
-        #recieve button--------------------------
-        self.recieve_button = QPushButton("Recieve", self)
-        self.recieve_button.setGeometry(600, 485 + 50, 150, 35)
-        self.recieve_button.setStyleSheet("background-color: #cc4221; color: white; border: none; padding: 0px;border-radius:10px;font-size: 20px")
-        self.recieve_button.clicked.connect(self.recieve_data_helper)  # Connect the button click to the send_data function
-        self.recieve_thread = None
+        #receive button--------------------------
+        self.receive_button = QPushButton("Receive", self)
+        self.receive_button.setGeometry(600, 485 + 50, 150, 35)
+        self.receive_button.setStyleSheet("background-color: #cc4221; color: white; border: none; padding: 0px;border-radius:10px;font-size: 20px")
+        self.receive_button.clicked.connect(self.receive_data_helper)  # Connect the button click to the send_data function
+        self.receive_thread = None
 
     #updating frames and displaying them-----------------------
     def update_frame(self):
@@ -112,7 +111,7 @@ class MainWindow(QMainWindow):
             p = convert_to_qt_format.scaled(self.WIDTH*2//3, self.HEIGHT*2//3, Qt.KeepAspectRatio)
             self.video_label.setPixmap(QPixmap.fromImage(p))
 
-    #function for capturing an snapshot---------------------------
+    #function for capture a snapshot---------------------------
     def capture_frame(self):
         ret, frame = self.capture.read()
 
@@ -144,7 +143,7 @@ class MainWindow(QMainWindow):
                 cv2.imshow('Preview (Press q to select and exit)', adjusted_frame)
 
                 #Press "q" key to exit
-                if cv2.waitKey(1) & 0xFF == ord('q'):
+                if cv2.waitKey(1) & 0xFF == ord('q') :
                     break
 
             #save and write the captured image
@@ -268,12 +267,12 @@ class MainWindow(QMainWindow):
     def send_data(self):
         client()
 
-    #Recieve the data ---------
-    def recieve_data_helper(self):
-        self.recieve_thread = threading.Thread(target=self.recieve_data)
-        self.recieve_thread.start()
+    #receive the data ---------
+    def receive_data_helper(self):
+        self.receive_thread = threading.Thread(target=self.receive_data)
+        self.receive_thread.start()
 
-    def recieve_data(self):
+    def receive_data(self):
         server()
 
 if __name__ == "__main__":
