@@ -17,15 +17,9 @@ function onload(event) {
 	initButton();
 }
 
-//Gets sensor readings
-function getReadings(){
-    websocket.send("getReadings");
-}
-
-// When websocket is established, call the getReadings() function
+// Logs the connection opening
 function onOpen(event) {
     console.log('Connection opened');
-    getReadings();
 }
 
 //Closes the sebsocket connection
@@ -34,16 +28,9 @@ function onClose(event) {
     setTimeout(initWebSocket, 2000);
 }
 
-// Function that receives the message from the ESP32 with the readings
+// Function that receives the messages
 function onMessage(event) {
     console.log(event.data);
-    var myObj = JSON.parse(event.data);
-    var keys = Object.keys(myObj);
-
-    for (var i = 0; i < keys.length; i++){
-        var key = keys[i];
-        document.getElementById(key).innerHTML = myObj[key];
-    }
 	
 	var state;
     if (event.data == "1"){

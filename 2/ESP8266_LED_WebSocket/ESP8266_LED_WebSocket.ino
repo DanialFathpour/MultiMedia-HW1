@@ -21,19 +21,9 @@ AsyncWebServer server(80);
 // Creates a WebSocket object
 AsyncWebSocket ws("/ws");
 
-// Json Variable to Hold Sensor Readings
-JSONVar readings;
-
 // Timer variables
 unsigned long lastTime = 0;  
 unsigned long timerDelay = 2000; // Means it reads ans sends values every 2s
-
-// Gets Sensor Readings and return JSON object
-String getSensorReadings(){
-  readings["light"] = String(analogRead(A0));
-  String jsonString = JSON.stringify(readings);
-  return jsonString;
-}
 
 String readsensor() {
   float t = analogRead(A0);
@@ -62,23 +52,20 @@ void initWiFi() {
   Serial.println(WiFi.localIP());
 }
 
-// Texts sensor readings and LED state using the Websocket object 
-void notifyClients(String sensorReadings) {
+// Texts LED state using the Websocket object 
+void notifyClients() {
   ws.textAll(String(ledState));
-  ws.textAll(sensorReadings);
 }
 
 // Handles the incoming websocket message from the client
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-    String sensorReadings = getSensorReadings();
-    Serial.print(sensorReadings);  
     data[len] = 0;
     if (strcmp((char*)data, "toggle") == 0) {
       ledState = !ledState;
     }
-    notifyClients(sensorReadings);
+    notifyClients();
   }
 }
 
@@ -118,36 +105,27 @@ void setup(){
   initWiFi();
   initWebSocket();
 
-  // Web Server Root URL
+// Web Server Root URL
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(LittleFS, "/index.html", "text/html");
   });
 
-  // Web Server request for the plot
+// Web Server request for the plot
   server.on("/light", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", readsensor().c_str());
   });
 
-//
+// Automatically handles requests and checks for filesystems (HTML, CSS, JS)
   server.serveStatic("/", LittleFS, "/");
 
-  // Starts server
+// Starts server
   server.begin();
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 void loop() {
-
-// Sends the data every 2s
-  if ((millis() - lastTime) > timerDelay) {
-    String sensorReadings = getSensorReadings();
-    Serial.print(sensorReadings);
-    notifyClients(sensorReadings);
-    lastTime = millis();
-  }
-
   digitalWrite(ledPin, ledState);
 
-// 
+// Manages the clients that are connected the server
   ws.cleanupClients();
 }
