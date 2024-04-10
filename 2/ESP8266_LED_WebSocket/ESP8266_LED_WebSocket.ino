@@ -1,15 +1,16 @@
-#include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include "LittleFS.h"
-#include <Arduino_JSON.h>
-#include <Hash.h>
+
 
 
 // Should be replaced with your network credentials
-const char* ssid = "Daniel_modem";
-const char* password = "MAUXX93633";
+const char* ssid = "modem";
+const char* password = "123456";
+
+
+
 
 // Defines LED pin and state
 bool ledState = 0;

@@ -44,6 +44,21 @@ It shows the webcam and can capture an image using `openCV`. The picture can be 
 
 **Note**: Ensure that you first click "Receive" and then "Send" for proper functionality, as the server needs to be created before data transmission.
 
-**Caution:** First you should click `receive` then `send` for it to work properly. (First it should create the server)
 
-## Wireless Communication & Command**
+## Wireless Communication & Command
+
+
+![Video-Voice Chat schematic](part2sch.jpg)
+
+In the second part of this project we run a webserver `NodeMCU(ESP8266)` and connect clients to it so we can read a sensor's value (`LDR`) and control an output (`LED`) using **`Websocket`**.
+
+### Prerequisites
+for this code to work, you need to install a couple of libraries on ArduinoIDE:
+* ESP8266
+* littleFS
+* ESPAsyncTCP
+* ESPAsyncWebServer
+and you should change the network credentials (routername, password).
+
+### How it works 
+The ESP8266 creates an `AsyncWebServer` on port 80 (HTTP port because `websocket` is HTTP-based) and a websocket object to exchange data. for the sensor part, it reads the sensor value every time the HTTP requests and for the LED part, every time the `toggle` button is pressed the state of the LED changes.
